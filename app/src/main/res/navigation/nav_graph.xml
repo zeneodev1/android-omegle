@@ -11,7 +11,14 @@
         android:id="@+id/mainFragment"
         android:name="com.zeneo.omechle.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_videoFragment"
+            app:destination="@id/videoFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_textFragment"
+            app:destination="@id/textFragment" />
+    </fragment>
     <fragment
         android:id="@+id/textFragment"
         android:name="com.zeneo.omechle.TextFragment"
