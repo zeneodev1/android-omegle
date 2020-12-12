@@ -1,54 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout tools:context=".ui.main.text.TextFragment"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorPrimary"
-    tools:context=".TextFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <data>
+        
+        <import type="com.zeneo.omechle.constant.State"/>
+        <import type="android.view.View"/>
+        <import type="androidx.databinding.ObservableField"/>
+        <import type="androidx.databinding.ObservableInt"/>
+        <variable
+            name="state"
+            type="ObservableField&lt;State>" />
+        <variable
+            name="count"
+            type="ObservableInt" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_margin="15dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
 
-        <ImageButton
-            android:id="@+id/add_tags_image_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/main_button_shape"
-            android:padding="12dp"
-            android:src="@drawable/ic_baseline_close_24"
-            android:layout_marginEnd="10dp"
-            />
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="@{state == com.zeneo.omechle.constant.State.CONNECTING || state == com.zeneo.omechle.constant.State.IN_QUEUE ? View.VISIBLE : View.GONE}">
+
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text='@{state == com.zeneo.omechle.constant.State.CONNECTING ? "Connecting...." : "Matching...."}'
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:background="@drawable/main_input_chat"
-            android:gravity="center">
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility='@{state == com.zeneo.omechle.constant.State.IN_ROOM &amp;&amp; count == 0 ? View.VISIBLE : View.GONE}'>
 
-            <EditText
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="20dp"
-                android:background="@android:color/transparent"
-                android:hint="Type something..."
-                android:textColorHint="@android:color/darker_gray"
+                android:layout_marginTop="20dp"
+                android:textColor="@android:color/white"
+                android:text='You have been matched, Say Hi!'/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility='@{state == com.zeneo.omechle.constant.State.LEFT ? View.VISIBLE : View.GONE}'>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textColor="@android:color/white"
+                android:text='Member has been left the conversation'/>
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/messages_list"
+            android:visibility='@{state == com.zeneo.omechle.constant.State.IN_ROOM ? View.VISIBLE : View.GONE}'
+            android:paddingVertical="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="15dp">
+
+            <ImageButton
+                android:id="@+id/next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/main_button_shape"
+                android:padding="10dp"
+                android:src="@drawable/ic_baseline_navigate_next_24"
+                android:visibility='@{state == com.zeneo.omechle.constant.State.LEFT ? View.VISIBLE : View.GONE}'
                 />
 
             <ImageButton
+                android:id="@+id/stop_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:src="@drawable/ic_path_17"
-                android:background="@android:color/transparent"/>
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/main_button_shape"
+                android:padding="12dp"
+                android:src="@drawable/ic_baseline_close_24"
+                android:visibility='@{state == com.zeneo.omechle.constant.State.LEFT ? View.GONE : View.VISIBLE}'
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/main_input_chat"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/message_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="Type something..."
+                    android:textColorHint="@android:color/darker_gray" />
+
+                <ImageButton
+                    android:id="@+id/send_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:padding="15dp"
+                    android:src="@drawable/ic_path_17" />
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

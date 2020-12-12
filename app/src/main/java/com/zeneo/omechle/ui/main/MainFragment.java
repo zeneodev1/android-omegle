@@ -1,4 +1,4 @@
-package com.zeneo.omechle;
+package com.zeneo.omechle.ui.main;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.zeneo.omechle.R;
 
 public class MainFragment extends Fragment {
 
@@ -34,6 +37,21 @@ public class MainFragment extends Fragment {
 
         chipGroup = view.findViewById(R.id.chipGroup);
         chipGroup.addView(getChip("New"));
+
+        view.findViewById(R.id.text_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavController navController = NavHostFragment.findNavController(MainFragment.this);
+                navController.navigate(R.id.action_mainFragment_to_textFragment);
+            }
+        });
+        view.findViewById(R.id.video_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavController navController = NavHostFragment.findNavController(MainFragment.this);
+                navController.navigate(R.id.action_mainFragment_to_videoFragment);
+            }
+        });
     }
 
     private Chip getChip(String text){

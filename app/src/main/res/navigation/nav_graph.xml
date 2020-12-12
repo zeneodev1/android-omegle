@@ -9,7 +9,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.zeneo.omechle.MainFragment"
+        android:name="com.zeneo.omechle.ui.main.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -21,12 +21,12 @@
     </fragment>
     <fragment
         android:id="@+id/textFragment"
-        android:name="com.zeneo.omechle.TextFragment"
+        android:name="com.zeneo.omechle.ui.main.text.TextFragment"
         android:label="fragment_text"
         tools:layout="@layout/fragment_text" />
     <fragment
         android:id="@+id/videoFragment"
-        android:name="com.zeneo.omechle.VideoFragment"
+        android:name="com.zeneo.omechle.ui.main.video.VideoFragment"
         android:label="fragment_video"
         tools:layout="@layout/fragment_video" />
 </navigation>
