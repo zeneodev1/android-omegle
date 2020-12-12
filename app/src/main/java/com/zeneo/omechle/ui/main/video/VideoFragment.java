@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -112,7 +113,7 @@ public class VideoFragment extends Fragment implements JSCallback {
         webView.setWebChromeClient(new MyWebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setMediaPlaybackRequiresUserGesture(true);
-
+        webView.addJavascriptInterface(this, "Android");
         loadWebView();
     }
 
@@ -201,6 +202,7 @@ public class VideoFragment extends Fragment implements JSCallback {
     }
 
     @Override
+    @JavascriptInterface
     public void onPeerConnected() {
         start();
     }
