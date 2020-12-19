@@ -169,6 +169,7 @@ public class TextFragment extends Fragment {
         if (state.get() == State.IN_ROOM) {
             matchingRepository.sendExit(currentRoom.getId());
             state.set(State.LEFT);
+            messages.clear();
         }
     }
 
