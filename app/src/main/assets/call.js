@@ -7,17 +7,22 @@ remoteVideo.style.opacity = 0
 localVideo.onplaying = () => { localVideo.style.opacity = 1 }
 remoteVideo.onplaying = () => { remoteVideo.style.opacity = 1 }
 
+let currentCall;
+
 let peer
 function init(userId) {
-    peer = new Peer(userId, {
-        host: '192.168.43.242',
-        port: 9000,
-        path: '/videocallapp'
-    })
+    peer = new Peer(userId)
 
     peer.on('open', () => {
-        Android.onPeerConnected()
+        Android.onPeerConnected();
     })
+
+    navigator.getUserMedia({
+                audio: true,
+                video: true
+            }, (stream) => {
+                localVideo.srcObject = stream
+            })
 
     listen()
 }
@@ -30,16 +35,14 @@ function listen() {
             audio: true,
             video: true
         }, (stream) => {
-            localVideo.srcObject = stream
+
+            currentCall = call;
+
             localStream = stream
 
             call.answer(stream)
             call.on('stream', (remoteStream) => {
                 remoteVideo.srcObject = remoteStream
-
-                remoteVideo.className = "primary-video"
-                localVideo.className = "secondary-video"
-
             })
 
         })
@@ -53,18 +56,26 @@ function startCall(otherUserId) {
         video: true
     }, (stream) => {
 
-        localVideo.srcObject = stream
         localStream = stream
 
         const call = peer.call(otherUserId, stream)
+        currentCall = call;
         call.on('stream', (remoteStream) => {
+            console.log(remoteStream.active);
             remoteVideo.srcObject = remoteStream
-
-            remoteVideo.className = "primary-video"
-            localVideo.className = "secondary-video"
         })
 
     })
+}
+
+
+function stopCall() {
+   remoteVideo.srcObject = null;
+   if (currentCall !== null) {
+       currentCall.close();
+       currentCall = null;
+   }
+
 }
 
 function toggleVideo(b) {

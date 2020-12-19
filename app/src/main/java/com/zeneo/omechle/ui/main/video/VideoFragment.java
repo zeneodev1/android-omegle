@@ -1,23 +1,35 @@
 package com.zeneo.omechle.ui.main.video;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableInt;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.zeneo.omechle.JSCallback;
@@ -27,20 +39,17 @@ import com.zeneo.omechle.constant.State;
 import com.zeneo.omechle.databinding.FragmentVideoBinding;
 import com.zeneo.omechle.model.Message;
 import com.zeneo.omechle.model.Room;
-import com.zeneo.omechle.network.client.MyWebChromeClient;
 import com.zeneo.omechle.network.client.MyWebViewClient;
 import com.zeneo.omechle.network.stomp.Stomp;
 import com.zeneo.omechle.repository.MatchingRepository;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class VideoFragment extends Fragment implements JSCallback {
-
-
 
     private final static String TAG = "Video Fragment";
     private String userId;
@@ -61,6 +70,44 @@ public class VideoFragment extends Fragment implements JSCallback {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        checkPermission(158);
+    }
+
+    // Function to check and request permission
+    public void checkPermission(int requestCode)
+    {
+
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat
+                    .requestPermissions(
+                            getActivity(),
+                            new String[] {Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA, Manifest.permission.MODIFY_AUDIO_SETTINGS},
+                            requestCode);
+        }
+        else {
+            Log.d(TAG, "Permissions already granted!");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getActivity(), "Permissions Granted!", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, String.valueOf(grantResults.length));
+        } else {
+            Log.d(TAG, "Permissions Denied!");
+            NavController navController = NavHostFragment.findNavController(this);
+            navController.popBackStack();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         FragmentVideoBinding videoBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_video, container, false);
@@ -72,9 +119,7 @@ public class VideoFragment extends Fragment implements JSCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         initViews(view);
-
         RecyclerView messagesList = view.findViewById(R.id.messages_list);
         adapter = new MessagesListAdapter(messages, getContext());
         messagesList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -88,7 +133,6 @@ public class VideoFragment extends Fragment implements JSCallback {
                 setupWebView();
             }
         });
-
     }
 
     void initViews(View view) {
@@ -110,11 +154,25 @@ public class VideoFragment extends Fragment implements JSCallback {
     }
 
     private void setupWebView() {
-        webView.setWebChromeClient(new MyWebChromeClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setMediaPlaybackRequiresUserGesture(true);
-        webView.addJavascriptInterface(this, "Android");
-        loadWebView();
+        webView.post(() -> {
+            webView.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onPermissionRequest(final PermissionRequest request) {
+                    request.grant(request.getResources());
+                }
+                @Override
+                public boolean onConsoleMessage(ConsoleMessage cm) {
+                    Log.d("MyApplication", cm.message() + " -- From line "
+                            + cm.lineNumber() + " of "
+                            + cm.sourceId() );
+                    return true;
+                }
+            });
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+            webView.addJavascriptInterface(this, "Android");
+            loadWebView();
+        });
     }
 
     private void loadWebView() {
@@ -140,6 +198,9 @@ public class VideoFragment extends Fragment implements JSCallback {
         matchingRepository.watchAcceptedMatching(userId, (header, body) -> {
             state.set(State.IN_ROOM);
             currentRoom = new Gson().fromJson(body, Room.class);
+            if (currentRoom.getUsers().get(0).getId().equals(userId)) {
+                callJavascriptFunction("javascript:startCall(\""+ currentRoom.getUsers().get(1).getId() +"\")");
+            }
             watchRoom();
         });
     }
@@ -163,8 +224,9 @@ public class VideoFragment extends Fragment implements JSCallback {
                 }
             });
             matchingRepository.watchRoom(currentRoom.getId(), (headers, body) -> {
-                Map<String, Objects> data = new Gson().fromJson(body, Map.class);
-                if (data.get("type").equals("exit")) {
+                Map data = new Gson().fromJson(body, Map.class);
+                String type = String.valueOf(data.get("type"));
+                if (type.equals("exit")) {
                     leftRoom();
                 }
             });
@@ -191,7 +253,9 @@ public class VideoFragment extends Fragment implements JSCallback {
     public void leftRoom() {
         if (state.get() == State.IN_ROOM) {
             matchingRepository.sendExit(currentRoom.getId());
+            callJavascriptFunction("javascript:stopCall()");
             state.set(State.LEFT);
+            messages.clear();
         }
     }
 
