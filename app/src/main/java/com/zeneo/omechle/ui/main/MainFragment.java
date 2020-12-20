@@ -17,9 +17,6 @@ import com.zeneo.omechle.R;
 
 public class MainFragment extends Fragment {
 
-    private ChipGroup chipGroup;
-    private Chip chip;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +31,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        chipGroup = view.findViewById(R.id.chipGroup);
-        chipGroup.addView(getChip("New"));
 
         view.findViewById(R.id.text_button).setOnClickListener(new View.OnClickListener() {
             @Override
