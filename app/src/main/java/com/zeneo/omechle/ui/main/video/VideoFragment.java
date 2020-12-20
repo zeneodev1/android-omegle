@@ -72,7 +72,7 @@ public class VideoFragment extends Fragment implements JSCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.i(TAG, "LOL");
         checkPermission(158);
     }
 
@@ -226,7 +226,7 @@ public class VideoFragment extends Fragment implements JSCallback {
             matchingRepository.watchRoom(currentRoom.getId(), (headers, body) -> {
                 Map data = new Gson().fromJson(body, Map.class);
                 String type = String.valueOf(data.get("type"));
-                if (type.equals("exit")) {
+                if (type.equals("EXIT")) {
                     leftRoom();
                 }
             });
@@ -275,6 +275,7 @@ public class VideoFragment extends Fragment implements JSCallback {
     public void onDestroy() {
         super.onDestroy();
         matchingRepository.disconnect();
+        webView.destroy();
     }
 
 }

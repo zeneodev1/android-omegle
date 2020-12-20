@@ -14,17 +14,20 @@ function init(userId) {
     peer = new Peer(userId)
 
     peer.on('open', () => {
-        Android.onPeerConnected();
-    })
 
     navigator.getUserMedia({
-                audio: true,
-                video: true
-            }, (stream) => {
-                localVideo.srcObject = stream
-            })
+                    audio: true,
+                    video: true
+                }, (stream) => {
+                    localVideo.srcObject = stream
+                    Android.onPeerConnected();
 
-    listen()
+                })
+
+        listen()
+    })
+
+
 }
 
 let localStream
