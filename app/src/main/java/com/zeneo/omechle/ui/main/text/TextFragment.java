@@ -23,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.zeneo.omechle.R;
 import com.zeneo.omechle.adapter.MessagesListAdapter;
+import com.zeneo.omechle.adapter.TextMessagesListAdapter;
 import com.zeneo.omechle.constant.State;
 import com.zeneo.omechle.databinding.FragmentTextBinding;
 import com.zeneo.omechle.model.Message;
@@ -50,7 +51,7 @@ public class TextFragment extends Fragment {
 
     private EditText messageEditText;
 
-    private MessagesListAdapter adapter;
+    private TextMessagesListAdapter adapter;
 
     private ObservableInt count = new ObservableInt(0);
 
@@ -89,8 +90,8 @@ public class TextFragment extends Fragment {
             next();
         });
 
-        RecyclerView messagesList = view.findViewById(R.id.messages_list);
-        adapter = new MessagesListAdapter(messages, getContext());
+        RecyclerView messagesList = view.findViewById(R.id.messages_recycler_view);
+        adapter = new TextMessagesListAdapter(messages, getContext());
         messagesList.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesList.setAdapter(adapter);
 
