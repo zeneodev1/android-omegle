@@ -21,28 +21,30 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary">
+        android:background="@color/whiteSmoke">
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
+        <RelativeLayout
+            android:id="@+id/progress_bar_container_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
             android:visibility="@{state == com.zeneo.omechle.constant.State.CONNECTING || state == com.zeneo.omechle.constant.State.IN_QUEUE ? View.VISIBLE : View.GONE}">
 
             <ProgressBar
                 android:layout_width="50dp"
-                android:layout_height="50dp" />
+                android:layout_centerInParent="true"
+                android:layout_height="50dp"
+                android:id="@+id/txt_msg_prg_bar"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text='@{state == com.zeneo.omechle.constant.State.CONNECTING ? "Connecting...." : "Matching...."}'
-                android:textColor="@android:color/white" />
+                android:layout_below="@id/txt_msg_prg_bar"
+                android:layout_centerInParent="true"
+                android:text='@{state == com.zeneo.omechle.constant.State.CONNECTING ? "Connecting..." : "Matching..."}'
+                android:textColor="@color/colorAccent" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,7 +57,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:textColor="@android:color/white"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
                 android:text='You have been matched, Say Hi!'/>
 
         </LinearLayout>
@@ -79,7 +82,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/messages_list"
+            android:id="@+id/messages_recycler_view"
             android:visibility='@{state == com.zeneo.omechle.constant.State.IN_ROOM ? View.VISIBLE : View.GONE}'
             android:paddingVertical="15dp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout3" />
@@ -90,8 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="15dp">
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageButton
                 android:id="@+id/next_button"
@@ -99,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/main_button_shape"
-                android:padding="10dp"
+                android:padding="4dp"
                 android:src="@drawable/ic_baseline_navigate_next_24"
                 android:visibility='@{state == com.zeneo.omechle.constant.State.LEFT ? View.VISIBLE : View.GONE}'
                 />
@@ -110,35 +112,37 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/main_button_shape"
-                android:padding="12dp"
+                android:padding="6dp"
                 android:src="@drawable/ic_baseline_close_24"
                 android:visibility='@{state == com.zeneo.omechle.constant.State.LEFT ? View.GONE : View.VISIBLE}'
                 />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/main_input_chat"
+                android:layout_height="36dp"
+                android:background="@drawable/main_input_chat_enabled"
                 android:gravity="center"
                 android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/message_input"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="15dp"
                     android:layout_weight="1"
+                    android:textSize="16sp"
                     android:background="@android:color/transparent"
                     android:hint="Type something..."
-                    android:textColorHint="@android:color/darker_gray" />
+                    android:textColor="@color/black"
+                    android:textColorHint="#898989" />
 
                 <ImageButton
                     android:id="@+id/send_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:padding="15dp"
-                    android:src="@drawable/ic_path_17" />
+                    android:padding="10dp"
+                    android:src="@drawable/ic_send_enabled" />
             </LinearLayout>
 
         </LinearLayout>
